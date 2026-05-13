@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Health Check — Aumyaa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green-50: #E1F5EE; --green-100: #9FE1CB; --green-300: #1D9E75;
+    --green-500: #0F6E56; --green-700: #085041; --green-900: #04342C;
+    --amber-50: #FAEEDA; --amber-700: #633806;
+    --red-50: #FCEBEB;
+    --gray-50: #F7F6F2; --gray-100: #EDECEA; --gray-200: #D3D1C7;
+    --text: #1A1A19; --text-muted: #5F5E5A; --text-faint: #888780;
+    --border: rgba(0,0,0,0.1); --border-strong: rgba(0,0,0,0.18);
+    --surface: #FFFFFF; --page-bg: #F4F3EF;
+    --radius: 12px; --radius-sm: 8px;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--page-bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(244,243,239,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-mark { width: 32px; height: 32px; background: var(--green-300); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; font-size: 13px; }
+  .logo-name { font-size: 16px; font-weight: 600; color: var(--text); }
+  .logo-name span { color: var(--green-300); }
+  .nav-pill { font-size: 12px; font-weight: 500; background: var(--green-50); color: var(--green-500); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--green-100); }
+
+  .hero {
+    background: linear-gradient(145deg, var(--green-900) 0%, var(--green-500) 100%);
+    padding: 4rem 2rem 3rem; text-align: center; color: #fff; position: relative; overflow: hidden;
+  }
+  .hero::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/svg%3E"); pointer-events: none; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); border-radius: 20px; padding: 5px 14px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.9); margin-bottom: 1.25rem; }
+  .hero-badge svg { width: 12px; height: 12px; }
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(28px,5vw,42px); font-weight: 400; line-height: 1.2; margin-bottom: 1rem; max-width: 640px; margin-left: auto; margin-right: auto; }
+  .hero p { font-size: 16px; opacity: 0.8; max-width: 520px; margin: 0 auto 1.75rem; line-height: 1.65; }
+  .hero-stats { display: flex; justify-content: center; gap: 2rem; font-size: 13px; opacity: 0.75; }
+  .hero-stats span { display: flex; align-items: center; gap: 5px; }
+
+  .container { max-width: 700px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .card-title { font-size: 16px; font-weight: 600; margin-bottom: 0.3rem; }
+  .card-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 1.25rem; line-height: 1.5; }
+
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  .field input { padding: 10px 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--gray-50); color: var(--text); outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+  .field input:focus { border-color: var(--green-300); background: #fff; box-shadow: 0 0 0 3px rgba(29,158,117,0.12); }
+  .field input::placeholder { color: var(--text-faint); }
+
+  .error-msg { font-size: 12px; color: #A32D2D; background: var(--red-50); border: 1px solid #F7C1C1; border-radius: var(--radius-sm); padding: 8px 12px; margin-top: 0.75rem; display: none; }
+
+  .progress-wrap { margin-bottom: 1.5rem; display: none; }
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .progress-label { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+  .progress-count { font-size: 13px; font-weight: 600; color: var(--green-300); }
+  .progress-track { height: 5px; background: var(--gray-100); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green-300), var(--green-500)); border-radius: 3px; transition: width 0.4s cubic-bezier(.4,0,.2,1); width: 0%; }
+
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--green-300); margin: 2rem 0 0.75rem; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 0.75rem; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+  .q-text { font-size: 14px; font-weight: 500; line-height: 1.55; margin-bottom: 1rem; color: var(--text); }
+  .q-num { color: var(--green-300); margin-right: 4px; font-weight: 600; }
+
+  .options { display: flex; flex-direction: column; gap: 7px; }
+  .opt { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; background: var(--gray-50); }
+  .opt:hover { border-color: var(--green-300); background: var(--green-50); }
+  .opt.selected { border-color: var(--green-300); background: var(--green-50); }
+  .opt-radio { width: 17px; height: 17px; border-radius: 50%; border: 1.5px solid var(--gray-200); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; background: #fff; }
+  .opt.selected .opt-radio { border-color: var(--green-300); background: var(--green-300); }
+  .opt.selected .opt-radio::after { content: ''; width: 6px; height: 6px; background: #fff; border-radius: 50%; display: block; }
+  .opt-text { font-size: 13px; color: var(--text); line-height: 1.4; }
+
+  .chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { padding: 7px 14px; border: 1px solid var(--border-strong); border-radius: 20px; font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.15s; color: var(--text-muted); background: var(--gray-50); }
+  .chip:hover { border-color: var(--green-300); color: var(--green-500); }
+  .chip.active { border-color: var(--green-300); background: var(--green-50); color: var(--green-500); font-weight: 500; }
+
+  .submit-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--green-300), var(--green-500)); color: #fff; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; margin-top: 1.75rem; transition: opacity 0.15s, transform 0.1s; }
+  .submit-btn:hover { opacity: 0.92; }
+  .submit-btn:active { transform: scale(0.99); }
+
+  #scorecard { display: none; }
+  .sc-hero { border-radius: var(--radius); padding: 2.5rem 2rem; text-align: center; color: #fff; margin-bottom: 1.5rem; position: relative; overflow: hidden; }
+  .sc-org { font-size: 12px; font-weight: 500; opacity: 0.65; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .sc-score-big { font-family: 'DM Serif Display', serif; font-size: 72px; line-height: 1; margin-bottom: 0.1rem; }
+  .sc-score-denom { font-size: 20px; opacity: 0.55; }
+  .sc-level-name { font-size: 22px; font-weight: 600; margin: 0.75rem 0 0.5rem; }
+  .sc-level-desc { font-size: 14px; opacity: 0.82; line-height: 1.65; max-width: 480px; margin: 0 auto; }
+
+  .sc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
+  .sc-metric { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; }
+  .sc-metric-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-faint); margin-bottom: 6px; }
+  .sc-metric-val { font-size: 22px; font-weight: 600; color: var(--text); }
+  .sc-metric-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .dim-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.25rem; }
+  .dim-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 1.25rem; }
+  .dim-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .dim-row:last-child { margin-bottom: 0; }
+  .dim-name { font-size: 13px; color: var(--text); width: 155px; flex-shrink: 0; }
+  .dim-track { flex: 1; height: 7px; background: var(--gray-100); border-radius: 4px; overflow: hidden; }
+  .dim-bar { height: 100%; border-radius: 4px; }
+  .dim-pct { font-size: 12px; color: var(--text-muted); width: 36px; text-align: right; flex-shrink: 0; font-weight: 500; }
+
+  .concern-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.25rem; }
+  .concern-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 0.75rem; }
+  .concern-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .concern-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; background: var(--gray-50); border: 1px solid var(--border); border-radius: 14px; font-size: 12px; color: var(--text-muted); }
+
+  .cta-card { background: linear-gradient(135deg, var(--green-900), var(--green-700)); border-radius: var(--radius); padding: 2rem; text-align: center; color: #fff; margin-bottom: 1.25rem; }
+  .cta-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 0.5rem; }
+  .cta-card p { font-size: 14px; opacity: 0.8; line-height: 1.6; margin-bottom: 1.5rem; max-width: 440px; margin-left: auto; margin-right: auto; }
+  .cta-email-row { display: flex; gap: 8px; max-width: 400px; margin: 0 auto 1rem; }
+  .cta-email-row input { flex: 1; padding: 10px 14px; font-size: 14px; font-family: 'DM Sans', sans-serif; border: 1px solid rgba(255,255,255,0.3); border-radius: var(--radius-sm); background: rgba(255,255,255,0.1); color: #fff; outline: none; }
+  .cta-email-row input::placeholder { color: rgba(255,255,255,0.5); }
+  .cta-email-row input:focus { border-color: rgba(255,255,255,0.6); }
+  .btn-white { padding: 10px 20px; background: #fff; color: var(--green-500); border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; white-space: nowrap; }
+  .btn-white:hover { opacity: 0.9; }
+  .cta-note { font-size: 11px; opacity: 0.55; }
+
+  .restart-btn { width: 100%; padding: 11px; border: 1px solid var(--border-strong); background: transparent; color: var(--text-muted); border-radius: var(--radius-sm); font-size: 14px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+  .restart-btn:hover { background: var(--gray-100); }
+  .disclaimer { font-size: 12px; color: var(--text-faint); text-align: center; line-height: 1.65; margin: 1.5rem 0 0.75rem; }
+
+  footer { text-align: center; padding: 2rem 1rem; font-size: 12px; color: var(--text-faint); border-top: 1px solid var(--border); margin-top: 1rem; }
+  footer a { color: var(--green-300); text-decoration: none; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--green-900); color: #fff; padding: 12px 24px; border-radius: 24px; font-size: 14px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.2); transition: transform 0.4s cubic-bezier(.4,0,.2,1); z-index: 999; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 540px) {
+    .field-grid { grid-template-columns: 1fr; }
+    .field.full { grid-column: 1; }
+    .sc-grid { grid-template-columns: 1fr; }
+    .hero { padding: 2.5rem 1.25rem 2rem; }
+    .cta-email-row { flex-direction: column; }
+    nav { padding: 0 1rem; }
+    .dim-name { width: 120px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="logo-mark">Au</div>
+    <span class="logo-name">Aumyaa<span>.</span></span>
+  </a>
+  <span class="nav-pill">Privacy Health Check</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    5-minute assessment
+  </div>
+  <h1>Privacy Health Check for Your Organisation</h1>
+  <p>We at Aumyaa have a quick 11-question scorecard to help you gauge your current risk exposure under India's DPDP framework — and walk away with a personalised readiness report.</p>
+  <div class="hero-stats">
+    <span>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      11 questions
+    </span>
+    <span>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      7 privacy dimensions
+    </span>
+    <span>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Instant scorecard
+    </span>
+  </div>
+</div>
+
+<div class="container">
+  <div id="surveyForm">
+    <div class="card">
+      <div class="card-title">Let's start with your details</div>
+      <div class="card-sub">Your scorecard will reflect your organisation's current posture. We'll use your email to send a personalised executive summary.</div>
+      <div class="field-grid">
+        <div class="field"><label>Your name</label><input type="text" id="fname" placeholder="Rajesh Kumar" autocomplete="name"></div>
+        <div class="field"><label>Designation</label><input type="text" id="role" placeholder="Chief Audit Officer"></div>
+        <div class="field full"><label>Company name</label><input type="text" id="company" placeholder="Your organisation"></div>
+        <div class="field full"><label>Work email</label><input type="email" id="email" placeholder="you@company.com" autocomplete="email"></div>
+      </div>
+      <div class="error-msg" id="captureErr">Please complete all fields above before proceeding.</div>
+    </div>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-header">
+        <span class="progress-label">Questions answered</span>
+        <span class="progress-count" id="progressCount">0 / 10</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div id="sections"></div>
+    <button class="submit-btn" onclick="handleSubmit()">Get my Privacy Scorecard →</button>
+  </div>
+
+  <div id="scorecard"></div>
+</div>
+
+<footer>
+  <p>© 2025 Aumyaa. All rights reserved. &nbsp;·&nbsp; <a href="mailto:soodharshita04@gmail.com">soodharshita04@gmail.com</a></p>
+  <p style="margin-top:6px">This assessment is for awareness purposes. It does not constitute legal or compliance advice.</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const QUESTIONS = [
+  {
+    section: "Section 1 — Know your data",
+    q: "Do you know where sensitive employee, customer, or vendor information exists across your organisation?",
+    opts: [
+      { text: "We do not have a clear view of where personal data resides", score: 0 },
+      { text: "Some departments maintain their own records independently", score: 1 },
+      { text: "Key systems and major data flows are understood", score: 2 },
+      { text: "We maintain a central, regularly updated view of personal data across the organisation", score: 3 }
+    ]
+  },
+  {
+    section: "Section 2 — Customer trust & consent",
+    q: "How confidently can your organisation demonstrate that individuals knowingly agreed to how their data is used?",
+    opts: [
+      { text: "We rely mainly on standard terms or implied consent", score: 0 },
+      { text: "Consent exists but may not be fully transparent or traceable", score: 1 },
+      { text: "Separate consent is taken for major activities", score: 2 },
+      { text: "Consent is clear, purpose-based, traceable, and easy to withdraw", score: 3 }
+    ]
+  },
+  {
+    section: "Section 2 — Customer trust & consent",
+    q: "If a customer or employee asks to delete or stop using their data, how prepared is your organisation to respond?",
+    opts: [
+      { text: "We currently do not have a defined process", score: 0 },
+      { text: "Requests are handled informally when received", score: 1 },
+      { text: "A manual process exists with internal coordination", score: 2 },
+      { text: "A documented and tested workflow exists with clear ownership", score: 3 }
+    ]
+  },
+  {
+    section: "Section 3 — Leadership & accountability",
+    q: "How clearly is data privacy ownership defined within your organisation?",
+    opts: [
+      { text: "No formal accountability has been assigned", score: 0 },
+      { text: "Privacy responsibilities are shared informally", score: 1 },
+      { text: "A responsible person or team has been identified", score: 2 },
+      { text: "Senior leadership actively oversees privacy governance and compliance", score: 3 }
+    ]
+  },
+  {
+    section: "Section 3 — Leadership & accountability",
+    q: "How actively is senior management involved in privacy and digital trust initiatives?",
+    opts: [
+      { text: "Privacy is not currently a leadership priority", score: 0 },
+      { text: "Discussions happen occasionally when issues arise", score: 1 },
+      { text: "Leadership reviews privacy risks periodically", score: 2 },
+      { text: "Privacy and data protection are part of strategic governance discussions", score: 3 }
+    ]
+  },
+  {
+    section: "Section 4 — Third-party & ecosystem risk",
+    q: "How confident are you that your vendors and partners handle personal data responsibly?",
+    opts: [
+      { text: "Vendor privacy obligations are not formally assessed", score: 0 },
+      { text: "Basic contractual clauses exist", score: 1 },
+      { text: "Important vendors undergo some privacy review", score: 2 },
+      { text: "Vendor contracts, assessments, and monitoring align with privacy obligations", score: 3 }
+    ]
+  },
+  {
+    section: "Section 5 — Security & incident readiness",
+    q: "How prepared is your organisation to handle a personal data breach or privacy incident?",
+    opts: [
+      { text: "No dedicated response process exists", score: 0 },
+      { text: "General IT incident handling is followed", score: 1 },
+      { text: "A privacy incident process exists but is not regularly tested", score: 2 },
+      { text: "Response procedures are documented, tested, and leadership-ready", score: 3 }
+    ]
+  },
+  {
+    section: "Section 5 — Security & incident readiness",
+    q: "How confident are you that personal information is adequately protected across systems and operations?",
+    opts: [
+      { text: "Security controls are inconsistent or unclear", score: 0 },
+      { text: "Basic controls exist for IT systems", score: 1 },
+      { text: "Additional controls protect sensitive data in important areas", score: 2 },
+      { text: "Security and privacy controls are comprehensive, monitored, and regularly reviewed", score: 3 }
+    ]
+  },
+  {
+    section: "Section 6 — Customer & employee rights",
+    q: "If an individual asks for access, correction, or clarification regarding their personal data, how effectively can your organisation respond?",
+    opts: [
+      { text: "We currently lack a structured response process", score: 0 },
+      { text: "Requests are managed informally", score: 1 },
+      { text: "Requests are handled through a defined internal process", score: 2 },
+      { text: "Requests are tracked, measured, and resolved within defined timelines", score: 3 }
+    ]
+  },
+  {
+    section: "Section 7 — Future readiness (DPDP)",
+    q: "Which statement best reflects your organisation's current approach to India's Digital Personal Data Protection (DPDP) requirements?",
+    opts: [
+      { text: "We are still evaluating what the law means for us", score: 0 },
+      { text: "Discussions have started internally", score: 1 },
+      { text: "A roadmap or compliance initiative is underway", score: 2 },
+      { text: "We have an executive-backed privacy transformation programme in motion", score: 3 }
+    ]
+  }
+];
+
+const CONCERNS = [
+  "Regulatory penalties","Customer trust & brand reputation","Third-party / vendor risk",
+  "Data breaches & cyber incidents","Lack of internal visibility","Cross-border data sharing",
+  "Employee data handling","Unsure where to start"
+];
+
+const DIMENSIONS = [
+  { name: "Data visibility",    qIdxs: [0],    max: 3 },
+  { name: "Consent & trust",   qIdxs: [1, 2], max: 6 },
+  { name: "Leadership",        qIdxs: [3, 4], max: 6 },
+  { name: "Vendor risk",       qIdxs: [5],    max: 3 },
+  { name: "Security readiness",qIdxs: [6, 7], max: 6 },
+  { name: "Individual rights", qIdxs: [8],    max: 3 },
+  { name: "DPDP readiness",    qIdxs: [9],    max: 3 }
+];
+
+const answers = new Array(10).fill(null);
+let selectedConcerns = [];
+
+function buildSections() {
+  const container = document.getElementById('sections');
+  let lastSection = '';
+  QUESTIONS.forEach((q, i) => {
+    if (q.section !== lastSection) {
+      const lbl = document.createElement('div');
+      lbl.className = 'section-label';
+      lbl.textContent = q.section;
+      container.appendChild(lbl);
+      lastSection = q.section;
+    }
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    const qText = document.createElement('div');
+    qText.className = 'q-text';
+    qText.innerHTML = `<span class="q-num">Q${i + 1}.</span>${q.q}`;
+    card.appendChild(qText);
+    const optsWrap = document.createElement('div');
+    optsWrap.className = 'options';
+    q.opts.forEach((o, j) => {
+      const opt = document.createElement('div');
+      opt.className = 'opt';
+      opt.innerHTML = `<div class="opt-radio"></div><div class="opt-text">${o.text}</div>`;
+      opt.addEventListener('click', () => {
+        optsWrap.querySelectorAll('.opt').forEach(x => x.classList.remove('selected'));
+        opt.classList.add('selected');
+        answers[i] = o.score;
+        updateProgress();
+      });
+      optsWrap.appendChild(opt);
+    });
+    card.appendChild(optsWrap);
+    container.appendChild(card);
+  });
+
+  const concLbl = document.createElement('div');
+  concLbl.className = 'section-label';
+  concLbl.textContent = 'Section 8 — Leadership concerns';
+  container.appendChild(concLbl);
+  const concCard = document.createElement('div');
+  concCard.className = 'q-card';
+  concCard.innerHTML = `<div class="q-text"><span class="q-num">Q11.</span>Which area concerns your leadership team the most? <em style="color:var(--text-faint);font-style:normal;font-size:12px">(select all that apply)</em></div><div class="chip-wrap" id="chipWrap"></div>`;
+  container.appendChild(concCard);
+  const chipWrap = concCard.querySelector('#chipWrap');
+  CONCERNS.forEach(c => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = c;
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('active');
+      if (chip.classList.contains('active')) selectedConcerns.push(c);
+      else selectedConcerns = selectedConcerns.filter(x => x !== c);
+    });
+    chipWrap.appendChild(chip);
+  });
+  document.getElementById('progressWrap').style.display = 'block';
+}
+
+function updateProgress() {
+  const done = answers.filter(a => a !== null).length;
+  document.getElementById('progressCount').textContent = `${done} / 10`;
+  document.getElementById('progressFill').style.width = `${Math.round(done / 10 * 100)}%`;
+}
+
+function handleSubmit() {
+  const name    = document.getElementById('fname').value.trim();
+  const role    = document.getElementById('role').value.trim();
+  const company = document.getElementById('company').value.trim();
+  const email   = document.getElementById('email').value.trim();
+  const errEl   = document.getElementById('captureErr');
+  if (!name || !role || !company || !email) {
+    errEl.style.display = 'block';
+    document.getElementById('fname').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  errEl.style.display = 'none';
+  const unanswered = answers.filter(a => a === null).length;
+  if (unanswered > 0) {
+    showToast(`Please answer all 10 scored questions (${unanswered} remaining).`);
+    const firstMissing = answers.findIndex(a => a === null);
+    const cards = document.querySelectorAll('.q-card');
+    if (cards[firstMissing]) cards[firstMissing].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  buildScorecard(name, role, company, email);
+}
+
+function buildScorecard(name, role, company, email) {
+  const total = answers.reduce((a, b) => a + b, 0);
+  const pct   = Math.round(total / 30 * 100);
+  let level, desc, heroBg;
+  if (total <= 10) {
+    level  = 'High Risk';
+    desc   = 'Your organisation has significant gaps across privacy governance, data visibility, and incident readiness. Immediate attention is recommended to reduce regulatory and reputational exposure under DPDP.';
+    heroBg = 'linear-gradient(145deg,#501313,#A32D2D)';
+  } else if (total <= 18) {
+    level  = 'Early Stage';
+    desc   = 'Some foundational elements are in place, but accountability, consent management, and vendor oversight need structured attention. A clear roadmap will help you move quickly.';
+    heroBg = 'linear-gradient(145deg,#412402,#BA7517)';
+  } else if (total <= 25) {
+    level  = 'Developing';
+    desc   = 'You have meaningful privacy practices underway. Strengthening governance, formalising data subject rights processes, and embedding leadership engagement will take you to the next level.';
+    heroBg = 'linear-gradient(145deg,#042C53,#185FA5)';
+  } else {
+    level  = 'Mature';
+    desc   = 'Your organisation demonstrates strong privacy posture across most dimensions. Focus on sustaining momentum and closing any remaining gaps for full DPDP strategic alignment.';
+    heroBg = 'linear-gradient(145deg,#04342C,#0F6E56)';
+  }
+
+  const dimRows = DIMENSIONS.map(d => {
+    const score  = d.qIdxs.reduce((s, idx) => s + (answers[idx] || 0), 0);
+    const dimPct = Math.round(score / d.max * 100);
+    const color  = dimPct >= 67 ? '#1D9E75' : dimPct >= 34 ? '#BA7517' : '#E24B4A';
+    return `<div class="dim-row"><div class="dim-name">${d.name}</div><div class="dim-track"><div class="dim-bar" style="width:${dimPct}%;background:${color}"></div></div><div class="dim-pct">${score}/${d.max}</div></div>`;
+  }).join('');
+
+  const concernHtml = selectedConcerns.length
+    ? selectedConcerns.map(c => `<span class="concern-chip">${c}</span>`).join('')
+    : '<span class="concern-chip">None specified</span>';
+
+  const dateStr = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  document.getElementById('scorecard').innerHTML = `
+    <div class="sc-hero" style="background:${heroBg}">
+      <div class="sc-org">Aumyaa Privacy Health Check · ${company}</div>
+      <div class="sc-score-big">${total}<span class="sc-score-denom">/30</span></div>
+      <div class="sc-level-name">${level}</div>
+      <div class="sc-level-desc">${desc}</div>
+    </div>
+    <div class="sc-grid">
+      <div class="sc-metric"><div class="sc-metric-lbl">Overall score</div><div class="sc-metric-val">${pct}%</div><div class="sc-metric-sub">${total} of 30 points</div></div>
+      <div class="sc-metric"><div class="sc-metric-lbl">Readiness level</div><div class="sc-metric-val" style="font-size:18px">${level}</div><div class="sc-metric-sub">Assessed ${dateStr}</div></div>
+      <div class="sc-metric"><div class="sc-metric-lbl">Completed by</div><div class="sc-metric-val" style="font-size:17px">${name}</div><div class="sc-metric-sub">${role}</div></div>
+      <div class="sc-metric"><div class="sc-metric-lbl">Organisation</div><div class="sc-metric-val" style="font-size:16px">${company}</div><div class="sc-metric-sub" style="word-break:break-all">${email}</div></div>
+    </div>
+    <div class="dim-card"><h3>Dimension-wise readiness</h3>${dimRows}</div>
+    <div class="concern-card"><h3>Leadership concerns identified</h3><div class="concern-chips">${concernHtml}</div></div>
+    <div class="cta-card">
+      <h3>Get your complimentary executive summary</h3>
+      <p>Our team at Aumyaa will prepare a personalised readiness brief highlighting your priority gaps and recommended next steps for DPDP compliance.</p>
+      <div class="cta-email-row">
+        <input type="email" id="ctaEmail" value="${email}" placeholder="Confirm your email">
+        <button class="btn-white" onclick="handleCTASubmit()">Send it to me</button>
+      </div>
+      <div class="cta-note">No spam. One email. No obligation.</div>
+    </div>
+    <p class="disclaimer">This assessment is designed to help organisations understand their current level of readiness for India's Digital Personal Data Protection (DPDP) requirements and identify practical improvement opportunities across governance, trust, and operational resilience. It does not constitute legal advice.</p>
+    <button class="restart-btn" onclick="location.reload()">↺ &nbsp; Start a new assessment</button>
+  `;
+
+  document.getElementById('surveyForm').style.display = 'none';
+  document.getElementById('scorecard').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function handleCTASubmit() {
+  const email = document.getElementById('ctaEmail').value.trim();
+  if (!email || !email.includes('@')) { showToast('Please enter a valid email address.'); return; }
+  const subject = encodeURIComponent('Aumyaa Privacy Health Check — Executive Summary Request');
+  const body = encodeURIComponent(`Please send me the executive summary for my Privacy Health Check results.\n\nEmail: ${email}`);
+  window.location.href = `mailto:soodharshita04@gmail.com?subject=${subject}&body=${body}`;
+  showToast("Request sent! We'll be in touch shortly.");
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+buildSections();
+</script>
+</body>
+</html>
